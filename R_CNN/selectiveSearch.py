@@ -51,6 +51,39 @@ def get_best_BB_list(region_proposals,gnd_truth):
 
     return positiveSamples,negativeSamples,training_labels
 
+def get_image_annotations(img_path,txt_path):
+        gnd_truth = []
+        img = cv2.imread(img_path)
+        img_h,img_w = img.shape[:2]
+
+        with open(txt_path,'r') as f:
+            lines = f.readlines()
+
+        for line in lines:
+            parts = line.strip().split()
+            if len(parts)!=5:
+                print("No data ..")
+                continue
+            try:
+                class_id = int(parts[0])
+                x_center = float(parts[1])
+                y_center = float(parts[2])
+                width = float(parts[3])
+                height = float(parts[4])
+
+                # YOLO Format
+                tlx = int((x_center - width/2)*img_w)
+                tly = int((y_center - height/2)*img_h)
+                brx = int((x_center + width/2)*img_w)
+                bry = int((y_center + height/2)*img_h)
+
+                gnd_truth.append([tlx,tly,brx,bry])
+            except ValueError:
+                print("incorrect values")
+                continue
+        
+        return gnd_truth
+
 
 def check_annotations(img_path,txt_path):
     img = cv2.imread(img_path)
@@ -86,39 +119,90 @@ def check_annotations(img_path,txt_path):
     cv2.imshow("annotations",img)
     cv2.waitKey(0)
 
+training_imgs = []
+training_labels = []
+
+def get_training_data(region_proposals,gnd_truth,img):
+    for bb in region_proposals:
+        iou_value = calculate_iou(bb,gnd_truth)
+        tlx,tly,brx,bry = bb
+        img_crop = img[tly:bry,tlx:brx]
+        img_crop = cv2.resize(img_crop,(224,224),interpolation=cv2.INTER_AREA)
+        training_imgs.append(img_crop)
+
+        if iou_value > 0.4:
+            training_labels.append(1)
+        else:
+            training_labels.append(0)
+
 img = cv2.imread(r"D:\Pavan\DataSets\Face_Detection_Dataset\images\train\0a0d7a87378422e3.jpg")
 folder_path = r"D:\Pavan\DataSets\Face_Detection_Dataset\images\train"
 
-for f in os.listdir(folder_path):
-    if f.lower().endswith(('.jpg','.jpeg','.png')):
-        image_path = os.path.join(folder_path,f)
-        base_name = os.path.splitext(f)[0]
-        text_path = os.path.join(folder_path,base_name+".txt")
+# for f in os.listdir(folder_path):
+#     if f.lower().endswith(('.jpg','.jpeg','.png')):
+#         image_path = os.path.join(folder_path,f)
+#         base_name = os.path.splitext(f)[0]
+#         text_path = os.path.join(folder_path,base_name+".txt")
 
-        if os.path.exists(image_path) and os.path.exists(text_path):
-            check_annotations(image_path,text_path)
+#         if os.path.exists(image_path) and os.path.exists(text_path):
+#             #stp1: Get each image ground truth boxes
+#             gnd_truth = get_image_annotations(image_path,text_path)
+#             #stp2: Get region pproposal boxes for the image
+#             proposals = get_region_proposals(img)
+#             #stp3 : Get training data and labels for classifier training.
+#             get_training_data(region_proposals=proposals,gnd_truth=gnd_truth,img=img)
+            
+
+# train = np.array(training_imgs)
+# labels = np.array(training_labels)
+
+# print(train.size)
+
+#Referece: https://www.google.com/search?q=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&oq=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&gs_lcrp=EgRlZGdlKgYIABBFGDkyBggAEEUYOTIGCAEQRRhAMgcIAhDrBxhA0gEJMjAyODJqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8
+
+# from keras.layers import Dense
+# from keras.preprocessing.image import ImageDataGenerator
+# from keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
+# from keras import Model
+
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
+from tensorflow.keras import Model
 
 
-gnd_truth = [110,44,600,677] #tlx,tly,brx,bry
+vgg_model = VGG16(weights='imagenet',include_top=False,input_shape=(224,224,3))
+vgg_model.summary()
 
-#Step 1: Extract Region proposals
-proposals = get_region_proposals(img)
+#The 16 in VGG16 refers to 16 layers that have weights. In VGG16 there are thirteen convolutional layers, five Max Pooling layers, and three Dense layers which sum up to 21 layers 
+# but it has only sixteen weight layers i.e., learnable parameters layer.
+# https://medium.com/@mygreatlearning/everything-you-need-to-know-about-vgg16-7315defb5918
+for i,layer in enumerate((vgg_model.layers)):
+    print(f"{i}: {layer.name}")
+    layer.trainable = False
 
-#Step 2: Create Positive and Negative samples
-positive_set,negative_set,training_labels = get_best_BB_list(proposals,gnd_truth)
+print(vgg_model.layers[-2].output)
 
-outputimg = img.copy()
-for box in positive_set:
-    cv2.rectangle(outputimg,(box[0],box[1]),(box[2],box[3]),(0,255,0),2)
 
-cv2.imwrite("final_boxes.jpg",outputimg)
-print("Done!!..")
 
+
+
+
+
+
+# gnd_truth = [110,44,600,677] #tlx,tly,brx,bry
+# #Step 1: Extract Region proposals
+# proposals = get_region_proposals(img)
+# #Step 2: Create Positive and Negative samples
+# positive_set,negative_set,training_labels = get_best_BB_list(proposals,gnd_truth)
+# outputimg = img.copy()
+# for box in positive_set:
+#     cv2.rectangle(outputimg,(box[0],box[1]),(box[2],box[3]),(0,255,0),2)
+# cv2.imwrite("final_boxes.jpg",outputimg)
+# print("Done!!..")
 # # plt.imshow(img_rz)
 # # plt.show()
-
 # #img_lbl,regions = ss.selective_search(img_rz,scale=500,sigma=0.9,min_size=10)
-
 # #candidates = set()
 # #https://www.geeksforgeeks.org/computer-vision/opencv-selective-search-for-object-detection/#selective-search
 
