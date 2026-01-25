@@ -1,6 +1,7 @@
 import cv2
 import os
 import numpy as np
+import keras
 import selectivesearch as ss
 import matplotlib.pyplot as plt
 
@@ -159,35 +160,30 @@ folder_path = r"D:\Pavan\DataSets\Face_Detection_Dataset\images\train"
 # print(train.size)
 
 #Referece: https://www.google.com/search?q=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&oq=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&gs_lcrp=EgRlZGdlKgYIABBFGDkyBggAEEUYOTIGCAEQRRhAMgcIAhDrBxhA0gEJMjAyODJqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8
-
-# from keras.layers import Dense
-# from keras.preprocessing.image import ImageDataGenerator
-# from keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
-# from keras import Model
-
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
-from tensorflow.keras import Model
-
-
-vgg_model = VGG16(weights='imagenet',include_top=False,input_shape=(224,224,3))
-vgg_model.summary()
+vgg_model = keras.applications.vgg16.VGG16(weights='imagenet',include_top=False,input_shape=(224,224,3))# Make include_top=True. it will give full model
+#vgg_model.summary()
 
 #The 16 in VGG16 refers to 16 layers that have weights. In VGG16 there are thirteen convolutional layers, five Max Pooling layers, and three Dense layers which sum up to 21 layers 
 # but it has only sixteen weight layers i.e., learnable parameters layer.
 # https://medium.com/@mygreatlearning/everything-you-need-to-know-about-vgg16-7315defb5918
 for i,layer in enumerate((vgg_model.layers)):
-    print(f"{i}: {layer.name}")
+    #print(f"{i}: {layer.name}")
     layer.trainable = False
 
-print(vgg_model.layers[-2].output)
+# Add classifer head. with include_top=False, last 4 layers of vggNet were rremoved. So, now, we are writing ou own classifier head
+x = vgg_model.output
+x = keras.layers.GlobalAveragePooling2D()(x)
+# print(x.shape) https://chatgpt.com/c/69748ab2-1784-8323-bef5-4b1e7621ca9d
+x = keras.layers.Dense(256,activation='relu')(x)
+predictions = keras.layers.Dense(1,activation='softmax')(x)
+final_model = keras.Model(inputs=vgg_model.input,outputs=predictions)
 
 
-
-
-
-
+opt = keras.optimizers.Adam(learning_rate=0.001)
+final_model.compile(loss=keras.losses.categorical_crossentropy,
+                    optimizer = opt,
+                    metrics = ["accuracy"])
+final_model.summary()
 
 
 # gnd_truth = [110,44,600,677] #tlx,tly,brx,bry
