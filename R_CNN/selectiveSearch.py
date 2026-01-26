@@ -4,6 +4,7 @@ import numpy as np
 import keras
 import selectivesearch as ss
 import matplotlib.pyplot as plt
+#import sklearn
 
 def get_region_proposals(img):
     img_lbl, proposals = ss.selective_search(img, min_size=1000)
@@ -124,40 +125,51 @@ training_imgs = []
 training_labels = []
 
 def get_training_data(region_proposals,gnd_truth,img):
-    for bb in region_proposals:
-        iou_value = calculate_iou(bb,gnd_truth)
-        tlx,tly,brx,bry = bb
-        img_crop = img[tly:bry,tlx:brx]
-        img_crop = cv2.resize(img_crop,(224,224),interpolation=cv2.INTER_AREA)
-        training_imgs.append(img_crop)
+    output = img.copy()
+    for gnd_truth_box in gnd_truth:
+        for bb in region_proposals:
+            iou_value = calculate_iou(bb,gnd_truth_box)
+            tlx,tly,brx,bry = bb
+            output = cv2.rectangle(output,(tlx,tly),(brx,bry),(0,255,0),2)
+            img_crop = img[tly:bry,tlx:brx]
+            img_crop = cv2.resize(img_crop,(224,224),interpolation=cv2.INTER_AREA)
+            training_imgs.append(img_crop)
 
-        if iou_value > 0.4:
-            training_labels.append(1)
-        else:
-            training_labels.append(0)
+            if iou_value > 0.4:
+                training_labels.append(1)
+            else:
+                training_labels.append(0)
+        output = cv2.rectangle(output,(gnd_truth_box[0],gnd_truth_box[1]),(gnd_truth_box[2],gnd_truth_box[3]),(0,0,255),2)
+    return output
 
-img = cv2.imread(r"D:\Pavan\DataSets\Face_Detection_Dataset\images\train\0a0d7a87378422e3.jpg")
-folder_path = r"D:\Pavan\DataSets\Face_Detection_Dataset\images\train"
+folder_path = r"D:\Pavan\DataSets\Face_Detection_Dataset\images\smalldata"
 
-# for f in os.listdir(folder_path):
-#     if f.lower().endswith(('.jpg','.jpeg','.png')):
-#         image_path = os.path.join(folder_path,f)
-#         base_name = os.path.splitext(f)[0]
-#         text_path = os.path.join(folder_path,base_name+".txt")
+index = 0
+for f in os.listdir(folder_path):
+    if f.lower().endswith(('.jpg','.jpeg','.png')):
+        image_path = os.path.join(folder_path,f)
+        base_name = os.path.splitext(f)[0]
+        text_path = os.path.join(folder_path,base_name+".txt")
 
-#         if os.path.exists(image_path) and os.path.exists(text_path):
-#             #stp1: Get each image ground truth boxes
-#             gnd_truth = get_image_annotations(image_path,text_path)
-#             #stp2: Get region pproposal boxes for the image
-#             proposals = get_region_proposals(img)
-#             #stp3 : Get training data and labels for classifier training.
-#             get_training_data(region_proposals=proposals,gnd_truth=gnd_truth,img=img)
+        if os.path.exists(image_path) and os.path.exists(text_path):
+            index=index+1
+            if index==5:
+                break
+            print(f"Processing image: {index}, name: {base_name}")
+            img = cv2.imread(image_path)
+            #stp1: Get each image ground truth boxes
+            gnd_truth = get_image_annotations(image_path,text_path)
+            #stp2: Get region pproposal boxes for the image
+            proposals = get_region_proposals(img)
+            #stp3 : Get training data and labels for classifier training.
+            verify = get_training_data(region_proposals=proposals,gnd_truth=gnd_truth,img=img)
+            cv2.imwrite(f"{index}_verify.jpg",verify)
             
 
-# train = np.array(training_imgs)
-# labels = np.array(training_labels)
+train = np.array(training_imgs)
+labels = np.array(training_labels)
 
-# print(train.size)
+print(train.shape)
 
 #Referece: https://www.google.com/search?q=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&oq=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&gs_lcrp=EgRlZGdlKgYIABBFGDkyBggAEEUYOTIGCAEQRRhAMgcIAhDrBxhA0gEJMjAyODJqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8
 vgg_model = keras.applications.vgg16.VGG16(weights='imagenet',include_top=False,input_shape=(224,224,3))# Make include_top=True. it will give full model
@@ -185,21 +197,8 @@ final_model.compile(loss=keras.losses.categorical_crossentropy,
                     metrics = ["accuracy"])
 final_model.summary()
 
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelBinarizer
 
-# gnd_truth = [110,44,600,677] #tlx,tly,brx,bry
-# #Step 1: Extract Region proposals
-# proposals = get_region_proposals(img)
-# #Step 2: Create Positive and Negative samples
-# positive_set,negative_set,training_labels = get_best_BB_list(proposals,gnd_truth)
-# outputimg = img.copy()
-# for box in positive_set:
-#     cv2.rectangle(outputimg,(box[0],box[1]),(box[2],box[3]),(0,255,0),2)
-# cv2.imwrite("final_boxes.jpg",outputimg)
-# print("Done!!..")
-# # plt.imshow(img_rz)
-# # plt.show()
-# #img_lbl,regions = ss.selective_search(img_rz,scale=500,sigma=0.9,min_size=10)
-# #candidates = set()
-# #https://www.geeksforgeeks.org/computer-vision/opencv-selective-search-for-object-detection/#selective-search
 
 
