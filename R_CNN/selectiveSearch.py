@@ -170,6 +170,15 @@ train = np.array(training_imgs)
 labels = np.array(training_labels)
 
 print(train.shape)
+print(labels.shape)
+
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test = train_test_split(train,labels,test_size=0.2)
+
+print(x_train.shape)
+print(y_train.shape)
+print(x_test.shape)
+print(y_test.shape)
 
 #Referece: https://www.google.com/search?q=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&oq=i+want+to+use+VGG+using+pretrained+weights.+how+to+do+in+keras&gs_lcrp=EgRlZGdlKgYIABBFGDkyBggAEEUYOTIGCAEQRRhAMgcIAhDrBxhA0gEJMjAyODJqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8
 vgg_model = keras.applications.vgg16.VGG16(weights='imagenet',include_top=False,input_shape=(224,224,3))# Make include_top=True. it will give full model
@@ -187,18 +196,34 @@ x = vgg_model.output
 x = keras.layers.GlobalAveragePooling2D()(x)
 # print(x.shape) https://chatgpt.com/c/69748ab2-1784-8323-bef5-4b1e7621ca9d
 x = keras.layers.Dense(256,activation='relu')(x)
-predictions = keras.layers.Dense(1,activation='softmax')(x)
+predictions = keras.layers.Dense(1,activation='sigmoid')(x) #softmax
 final_model = keras.Model(inputs=vgg_model.input,outputs=predictions)
 
 
 opt = keras.optimizers.Adam(learning_rate=0.001)
-final_model.compile(loss=keras.losses.categorical_crossentropy,
+final_model.compile(loss=keras.losses.binary_crossentropy, #categoricalcrossentropy
                     optimizer = opt,
                     metrics = ["accuracy"])
 final_model.summary()
+history = final_model.fit(x_train,y_train,epochs=10,batch_size=32,validation_data=(x_test,y_test))
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelBinarizer
+
+# Inference
+img_path = r"D:\Pavan\DataSets\Face_Detection_Dataset\images\val\0bfa4810c3b74772.jpg"
+img = cv2.imread(img_path)
+
+proposals = get_region_proposals(img)
+
+for proposal in proposals:
+    tlx,tly,brx,bry = proposal
+    img_crop = img[tly:bry,tlx:brx]
+    img_rz = cv2.resize(img_crop,(224,224),interpolation=cv2.INTER_LINEAR)
+    img_rz = np.expand_dims(img_rz,axis=0)
+    out = final_model.predict(img_rz)
+    if out[0][0] > 0.5:
+        cv2.rectangle(img,(tlx,tly),(brx,bry),(0,255,0),2) # final bounding box on required image
+
+
 
 
 
