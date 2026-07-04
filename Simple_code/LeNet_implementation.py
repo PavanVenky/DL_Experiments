@@ -36,7 +36,8 @@ y_test = keras.utils.to_categorical(y_test,10)
 #Build LeNet Model
 model = keras.Sequential()
 
-model.add(layers.Conv2D(filters=6,kernel_size=(5,5),activation='tanh',input_shape=(28,28,1)))
+model.add(layers.InputLayer(input_shape=(28,28,1)))
+model.add(layers.Conv2D(filters=6,kernel_size=(5,5),activation='tanh'))
 model.add(layers.AveragePooling2D(pool_size=(2,2)))
 model.add(layers.Conv2D(filters=16,kernel_size=(5,5),activation='tanh'))
 model.add(layers.AveragePooling2D(pool_size=(2,2)))

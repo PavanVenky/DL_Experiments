@@ -8,7 +8,7 @@ def build_model(input_shape=(224,224,3),classes_cnt=2):
     for layer in base_model.layers:
         layer.trainable = False
     
-    inputs = keras.Input(input_shape)
+    inputs = keras.Input(shape=input_shape)
 
     x = base_model(inputs,training=False)
     x = keras.layers.Flatten()(x)

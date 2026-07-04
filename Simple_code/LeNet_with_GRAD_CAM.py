@@ -2,8 +2,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-
-from keras.layers import Conv2D,MaxPooling2D,Flatten,Input
+import keras
+from keras.layers import Conv2D,MaxPooling2D,Flatten,AveragePooling2D,Activation, Input,Dense
 from keras.models import Sequential,Model
 from keras.losses import CategoricalCrossentropy
 from keras.optimizers import Adam
@@ -74,4 +74,38 @@ X = X/255.0 #normalize data
 
 x_train,x_test,y_train,y_test = train_test_split(X,Y,test_size=0.2,stratify=Y,random_state=42)
 print(f"Total Images: {len(X)} Train data = {len(x_train)} test data = {len(x_test)}")
+
 print(f"labels: {label_name}")
+print(f"train data shape {x_train.shape}")
+print(f"test data shape {x_test.shape}")
+print(f"train labels shape {y_train.shape}")
+print(f"test lables shape {y_test.shape}")
+
+num_classes = len(classes)
+input_shape = (128,128,3)
+print(f"Total classes {num_classes}")
+
+# Implement Model
+model = Sequential()
+model.add(Input(shape=input_shape))
+
+model.add(Conv2D(filters=16,kernel_size=(5,5),padding='same',activation='relu'))
+model.add(AveragePooling2D(pool_size=(2,2),strides=(2,2)))
+
+model.add(Conv2D(filters=6,kernel_size=(5,5),padding='same',activation='relu'))
+model.add(AveragePooling2D(pool_size=(2,2),strides=(2,2)))
+
+model.add(Flatten())
+model.add(Dense(120))
+model.add(Activation('relu'))
+model.add(Dense(84))
+model.add(Activation('relu'))
+model.add(Dense(num_classes))
+model.add(Activation('softmax'))
+
+model.compile(loss=keras.losses.categorical_crossentropy,
+              optimizer=Adam(learning_rate=0.001),
+              metrics=['accuracy'])
+print(model.summary())
+
+print("DONE")
