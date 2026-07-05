@@ -1,45 +1,94 @@
-import os
-import cv2
-import pandas as pd
+import torch
+import torch.nn as nn
+import torchvision
+from torchvision.transforms import transforms
+from torch.optim import Adam
 
-def drawbounding_boxes():
-    image_dir = r"D:\Pavan\My_Python_Project\Tiny_LISA"
-    csv_path = r"D:\Pavan\My_Python_Project\Tiny_LISA\annotations.csv"
-    output_dir = os.path.join(image_dir, "output")
+#https://www.digitalocean.com/community/tutorials/writing-cnns-from-scratch-in-pytorch
 
-    # Create output folder if not exists
-    os.makedirs(output_dir, exist_ok=True)
+a = torch.tensor([1,2,3],requires_grad=False)
+b = torch.rand(1,3,requires_grad=False)
+d = torch.ones(3,4) # 3 rows, 4 cols
 
-    # Load annotations
-    df = pd.read_csv(csv_path)
+c = a*b
 
-    for idx, row in df.iterrows():
-        filename = row['filename']
-        x1, y1, x2, y2 = int(row['x1']), int(row['y1']), int(row['x2']), int(row['y2'])
-        cls = row['class']
+# AutoGrad: Automatic Differentiation (VERY IMPORTANT)
+x = torch.tensor(2.0,requires_grad=True)
+y = torch.tensor(3.0,requires_grad=True)
 
-        img_path = os.path.join(image_dir, filename)
+z = x**3+y**3
+z.backward() # this computes dz/dx(which is 12) and dz/dy.(which is 27). (this is how partial deravaties calculated for loss function as a function of n number of weights.
 
-        if not os.path.isfile(img_path):
-            print(f"Image not found: {img_path}")
-            continue
+# CNN using pytorch.
+class Network(nn.Module):
+    def __init__(self, input_shape,hid_layers, num_classes):
+        super().__init__()
+        self.fc1 = nn.Linear(input_shape,hid_layers)
+        self.activation = nn.ReLU()
+        self.fc2 = nn.Linear(hid_layers,num_classes)
 
-        # Load image
-        img = cv2.imread(img_path)
+    def forward(self,x):
+        x = self.fc1(x)
+        x = self.activation(x)
+        x = self.fc2(x)
+        return x
 
-        # Draw bounding box (green rectangle)
-        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
-        # Put class label above box
-        cv2.putText(img, cls, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6, (0, 255, 0), 2, cv2.LINE_AA)
+iris = load_iris()
+X,y = iris.data,iris.target # 4 values to check # finally 3 classes
 
-        # Save image
-        out_path = os.path.join(output_dir, f"boxed_{filename}")
-        cv2.imwrite(out_path, img)
+X_train,X_test, y_train,y_test = train_test_split(X,y,random_state=42,test_size=0.2)
 
-        print(f"Saved: {out_path}")
+# Standardize the features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-    print("DONE — All bounding boxes drawn.")
+print(len(X_train))
+print(len(X_test))
+print(len(y_train))
+print(len(y_test))
 
-drawbounding_boxes()
+torch.manual_seed(42)
+
+#define input shapes, hidden layers, output shape
+input_shape = X.shape[1]
+hidden_layers = 10
+output_layers = len(iris.target_names)
+
+#model object
+model = Network(input_shape,hidden_layers,output_layers)
+
+#define Loss function and optimizer
+criteria = nn.CrossEntropyLoss()
+optim = Adam(model.parameters(),lr=0.01)
+
+#Convert to pytorch tesnors
+y_train_tensor = torch.LongTensor(y_train)
+X_train_tensor = torch.FloatTensor(X_train)
+
+#train model
+epochs = 100
+for epoch in range(epochs):
+    outpus = model(X_train_tensor)
+    loss = criteria(outpus,y_train_tensor)
+
+    optim.zero_grad()
+    loss.backward()
+    optim.step()
+
+    # Print the loss every 10 epochs
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
+
+#Test on test data
+with torch.no_grad():
+    X_test_tensor = torch.FloatTensor(X_test)
+    y_test_tensor = torch.LongTensor(y_test)
+    outputs = model(X_test_tensor)
+    _,predicted = torch.max(outputs,1)
+    accuracy = (predicted == y_test_tensor).sum().item() / len(y_test_tensor)
+    print(f'Accuracy on the test set: {accuracy:.2f}')
