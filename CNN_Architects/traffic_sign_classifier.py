@@ -6,6 +6,7 @@ import torchvision
 import torch.nn as nn
 from torch.utils.data import DataLoader,Dataset
 from torchvision import transforms
+import cv2
 from PIL import Image
 
 
@@ -124,16 +125,21 @@ class Mydata(Dataset):
         return len(self.imagesFolder)
     
     def __getitem__(self, index):
-        img = Image.open(self.imagesFolder[index]).convert("RGB")
-        label = torch.tensor(self.imagesLabels[index],dtype=torch.long)
+        img = cv2.imread(self.imagesFolder[index])
+        if img is None:
+            raise ValueError(f"Could not read image: {self.imagesFolder[index]}")
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
+        label = torch.tensor(self.imagesLabels[index], dtype=torch.long)
 
         if self.transform:
             img = self.transform(img)
 
-        return img,label
+        return img, label
     
 train_data = Mydata(imagepaths,imagelabels,transform)
-train_data_loader = DataLoader(train_data,batch_size=32,shuffle=True,num_workers=4)
+train_data_loader = DataLoader(train_data,batch_size=32,shuffle=True)
 
 for images,lables in train_data_loader:
     print(images.shape)
