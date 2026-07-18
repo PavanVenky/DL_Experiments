@@ -55,13 +55,13 @@ class Alexnet(nn.Module):
                                     nn.MaxPool2d(kernel_size=3,stride=2),
                                     nn.Dropout(0.5))
         self.fc1    = nn.Sequential(nn.Dropout(0.5),
-                                    nn.Linear(in_features=9216,out_features=4096),
+                                    nn.Linear(in_features=6400,out_features=4096),
                                     nn.ReLU())
         self.fc2    = nn.Sequential(nn.Dropout(0.5),
                                     nn.Linear(4096,4096),
                                     nn.ReLU())
         self.fc3    = nn.Sequential(nn.Linear(4096,num_classes),
-                                    nn.Softmax())
+                                    nn.Softmax(dim=1))
 
     def forward(self,x):
         out = self.layer1(x)

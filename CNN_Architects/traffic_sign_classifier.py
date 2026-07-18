@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader,Dataset
 from torchvision import transforms
 import cv2
 from PIL import Image
-
+from All_CNN_arcitects import Alexnet
 
 def load_labels(labels_csv_path):
     labels = {}
@@ -60,41 +60,6 @@ def count_images_by_class(folder_path):
     image_counts = [counts[classid]["count"] for classid in class_ids]
     label_texts = [labels.get(classid, f"class {classid}") for classid in class_ids]
 
-    # plt.figure(figsize=(10, 6))
-    # bars = plt.bar(class_ids, image_counts, color="skyblue", edgecolor="black")
-    # plt.xlabel("Class ID")
-    # plt.ylabel("Image Count")
-    # plt.title("Images per Class")
-    # plt.xticks(class_ids, class_ids)
-    # plt.grid(axis="y", alpha=0.3)
-
-    # max_count = max(image_counts) if image_counts else 0
-    # offset = max(1, max_count * 0.01)
-    # for bar, count, text in zip(bars, image_counts, label_texts):
-    #     height = bar.get_height()
-    #     plt.text(
-    #         bar.get_x() + bar.get_width() / 2,
-    #         height + offset,
-    #         str(count),
-    #         ha="center",
-    #         va="bottom",
-    #         fontsize=10,
-    #         fontweight="bold",
-    #         rotation=0,
-    #     )
-    #     plt.text(
-    #         bar.get_x() + bar.get_width() / 2,
-    #         height + offset * 4,
-    #         text,
-    #         ha="center",
-    #         va="bottom",
-    #         fontsize=9,
-    #         rotation=0,
-    #     )
-
-    # plt.tight_layout()
-    # plt.show()
-
     image_paths = []
     image_labels = []
     for classid in class_ids:
@@ -103,6 +68,7 @@ def count_images_by_class(folder_path):
         for path in counts[classid]["paths"]:
             image_paths.append(path)
             image_labels.append(classid)
+    print("*****************************")
 
     return counts, image_paths, image_labels
 
@@ -110,7 +76,10 @@ def count_images_by_class(folder_path):
 
 #get images and labels
 path = r"D:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\Datasets\Traffic_Sign_Dataset\traffic_Data\DATA"
+test_path = r"D:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\Datasets\Traffic_Sign_Dataset\traffic_Data\TEST"
+
 fulldata,imagepaths,imagelabels = count_images_by_class(path)
+testdata,imagepaths_test,imagelabels_test = count_images_by_class(test_path)
 
 transform = transforms.Compose([transforms.Resize((224,224)),
                                 transforms.ToTensor()])
@@ -141,6 +110,57 @@ class Mydata(Dataset):
 train_data = Mydata(imagepaths,imagelabels,transform)
 train_data_loader = DataLoader(train_data,batch_size=32,shuffle=True)
 
-for images,lables in train_data_loader:
-    print(images.shape)
-    print(lables.shape)
+test_data = Mydata(imagepaths_test,imagelabels_test,transform)
+test_data_loader = DataLoader(test_data,batch_size=32,shuffle=True)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# for images,lables in train_data_loader:
+#     print(images.shape)
+#     print(lables.shape)
+
+# print("********")
+
+# for images,lables in test_data_loader:
+#     print(images.shape)
+#     print(lables.shape)
+
+num_classes = len(set(imagelabels))
+model = Alexnet(num_classes=num_classes).to(device)
+
+optim = torch.optim.AdamW(model.parameters(),lr=0.001)
+cost_fn = nn.CrossEntropyLoss()
+
+# training start
+epochs = 200
+total_step = len(train_data_loader)
+
+for epoch in range(epochs): 
+    for i, (images, labels) in enumerate(train_data_loader):
+        images = images.to(device)
+        labels = labels.to(device)
+
+        outputs = model(images)
+        loss = cost_fn(outputs, labels)
+
+        optim.zero_grad()
+        loss.backward()
+        optim.step()
+        print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, epochs, i+1, total_step, loss.item()))
+
+
+#Test pipeline
+
+model.eval()
+
+for i,(images,lables) in enumerate(test_data_loader):
+    images = images.to(device)
+    labels = lables.to(device)
+    test_output = model(images)
+    predicted = torch.argmax(test_output,dim=1)
+
+    correct += (predicted==labels).sum().item()
+    total += lables.size(0)
+
+accuracy = 100.0 * correct/total
+print(f"Accuracy of the network on {total} test images: {accuracy:.2f}%")
