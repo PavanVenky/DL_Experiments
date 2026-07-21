@@ -1,0 +1,28 @@
+{
+  "os":  "Windows-10-10.0.26200-SP0",
+  "python":  "CPython 3.9.6",
+  "startedAt":  "2026-07-21T17:03:33.153168Z",
+  "program":  "d:\\Pavan\\My_Python_Project\\DL_Experiments\\DL_Experiments\\Simple_code\\wandb_exp.py",
+  "codePath":  "Simple_code\\wandb_exp.py",
+  "codePathLocal":  "Simple_code\\wandb_exp.py",
+  "git":  {
+    "remote":  "https://github.com/PavanVenky/DL_Experiments",
+    "commit":  "1d05d66fd403f7b28adb3b7e644561d3d75752a9"
+  },
+  "email":  "pavanvenkykaja@gmail.com",
+  "root":  "D:\\Pavan\\My_Python_Project\\DL_Experiments\\DL_Experiments",
+  "host":  "DESKTOP-MI0VEGJ",
+  "executable":  "C:\\Users\\hi\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+  "cpu_count":  4,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "125914050560",
+      "used":  "62257774592"
+    }
+  },
+  "memory":  {
+    "total":  "16915587072"
+  },
+  "writerId":  "ohepezs8s834fydcageohamxy5x6lz3p"
+}

@@ -1,0 +1,8 @@
+Epoch 1/200 | Train Loss: 0.9888 | Train Acc: 73.56% | Test Loss: 0.3808 | Test Acc: 89.56%
+Epoch 2/200 | Train Loss: 0.3216 | Train Acc: 90.97% | Test Loss: 0.2482 | Test Acc: 92.88%
+Epoch 3/200 | Train Loss: 0.2260 | Train Acc: 93.62% | Test Loss: 0.1795 | Test Acc: 94.90%
+Epoch 4/200 | Train Loss: 0.1663 | Train Acc: 95.29% | Test Loss: 0.1333 | Test Acc: 96.23%
+Epoch 5/200 | Train Loss: 0.1282 | Train Acc: 96.30% | Test Loss: 0.1046 | Test Acc: 96.81%
+Epoch 6/200 | Train Loss: 0.1044 | Train Acc: 96.99% | Test Loss: 0.0890 | Test Acc: 97.41%
+Epoch 7/200 | Train Loss: 0.0893 | Train Acc: 97.40% | Test Loss: 0.0768 | Test Acc: 97.72%
+Epoch 8/200 | Train Loss: 0.0785 | Train Acc: 97.73% | Test Loss: 0.0690 | Test Acc: 97.99%

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "d:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\Simple_code\wandb_exp.py", line 129, in <module>
+    main()
+  File "d:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\Simple_code\wandb_exp.py", line 110, in main
+    optimizer = optim.SGD(model.parameters(),lr=config.lr,momentum=0.9)
+AttributeError: 'dict' object has no attribute 'lr'

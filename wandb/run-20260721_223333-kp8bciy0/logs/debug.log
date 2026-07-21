@@ -1,0 +1,9 @@
+2026-07-21 22:33:33,207 INFO    MainThread:3672 [wandb_setup.py:_flush():81] Current SDK version is 0.26.1
+2026-07-21 22:33:33,207 INFO    MainThread:3672 [wandb_setup.py:_flush():81] Configure stats pid to 3672
+2026-07-21 22:33:33,207 INFO    MainThread:3672 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-07-21 22:33:33,207 INFO    MainThread:3672 [wandb_init.py:setup_run_log_directory():723] Logging user logs to D:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\wandb\run-20260721_223333-kp8bciy0\logs\debug.log
+2026-07-21 22:33:33,209 INFO    MainThread:3672 [wandb_init.py:setup_run_log_directory():724] Logging internal logs to D:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\wandb\run-20260721_223333-kp8bciy0\logs\debug-internal.log
+2026-07-21 22:33:33,210 INFO    MainThread:3672 [wandb_init.py:init():850] calling init triggers
+2026-07-21 22:33:33,210 INFO    MainThread:3672 [wandb_init.py:init():855] wandb.init called with sweep_config: {}
+config: {'epochs': 200, 'batch_size': 32, 'lr': 0.001, 'architecture': 'Lenet', 'dataset': 'MNIST', '_wandb': {}}
+2026-07-21 22:33:33,210 INFO    MainThread:3672 [wandb_init.py:init():898] starting backend

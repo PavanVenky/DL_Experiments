@@ -1,0 +1,46 @@
+_wandb:
+    value:
+        cli_version: 0.26.1
+        e:
+            tpgnrm4on9joml4rsrormxbclouj8385:
+                codePath: Simple_code\wandb_exp.py
+                codePathLocal: Simple_code\wandb_exp.py
+                email: pavanvenkykaja@gmail.com
+                executable: C:\Users\hi\AppData\Local\Programs\Python\Python39\python.exe
+                git:
+                    commit: 1d05d66fd403f7b28adb3b7e644561d3d75752a9
+                    remote: https://github.com/PavanVenky/DL_Experiments
+                host: DESKTOP-MI0VEGJ
+                os: Windows-10-10.0.26200-SP0
+                program: d:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\Simple_code\wandb_exp.py
+                python: CPython 3.9.6
+                root: D:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments
+                startedAt: "2026-07-21T16:59:50.493758Z"
+                writerId: tpgnrm4on9joml4rsrormxbclouj8385
+        m: []
+        python_version: 3.9.6
+        t:
+            "1":
+                - 1
+                - 41
+            "2":
+                - 1
+                - 41
+            "3":
+                - 16
+            "4": 3.9.6
+            "5": 0.26.1
+            "8":
+                - 3
+            "12": 0.26.1
+            "13": windows-amd64
+architecture:
+    value: Lenet
+batch_size:
+    value: 32
+dataset:
+    value: MNIST
+epochs:
+    value: 200
+lr:
+    value: 0.001
