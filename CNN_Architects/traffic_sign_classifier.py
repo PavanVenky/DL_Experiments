@@ -10,6 +10,11 @@ import cv2
 from PIL import Image
 from All_CNN_arcitects import Alexnet
 
+try:
+    import wandb
+except ImportError:
+    wandb = None
+
 def load_labels(labels_csv_path):
     labels = {}
     if not os.path.isfile(labels_csv_path):
@@ -133,9 +138,26 @@ cost_fn = nn.CrossEntropyLoss()
 
 # training start
 epochs = 200
+batch_size = 32
+learning_rate = 0.001
 total_step = len(train_data_loader)
 
-for epoch in range(epochs): 
+config = {
+    "epochs": epochs,
+    "batch_size": batch_size,
+    "learning_rate": learning_rate,
+    "architecture": "Alexnet",
+    "dataset": "Traffic Sign Dataset"
+}
+
+if wandb is not None:
+    wandb.init(project="traffic_sign_classifier", config=config)
+    wandb.watch(model, criterion=cost_fn, log="all", log_freq=100)
+
+for epoch in range(epochs):
+    model.train()
+    epoch_loss = 0.0
+
     for i, (images, labels) in enumerate(train_data_loader):
         images = images.to(device)
         labels = labels.to(device)
@@ -146,19 +168,30 @@ for epoch in range(epochs):
         optim.zero_grad()
         loss.backward()
         optim.step()
+
+        epoch_loss += loss.item()
         print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, epochs, i+1, total_step, loss.item()))
+
+    avg_epoch_loss = epoch_loss / total_step
+    print(f"Epoch [{epoch+1}/{epochs}] Average Loss: {avg_epoch_loss:.4f}")
+
+    if wandb is not None:
+        wandb.log({"epoch": epoch + 1, "train_loss": avg_epoch_loss})
 
 
 #Test pipeline
 
 model.eval()
 
+correct = 0.0
+total = 0.0
 for i,(images,lables) in enumerate(test_data_loader):
     images = images.to(device)
     labels = lables.to(device)
     test_output = model(images)
-    predicted = torch.argmax(test_output,dim=1)
-
+    probabilities = torch.softmax(test_output,dim=1)
+    _, predicted = torch.max(probabilities, dim=1)
+    
     correct += (predicted==labels).sum().item()
     total += lables.size(0)
 
