@@ -133,6 +133,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 num_classes = len(set(imagelabels))
 model = Alexnet(num_classes=num_classes).to(device)
 
+total_params = sum(p.numel() for p in model.parameters())
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+print(f"Total Parameters: {total_params:,}")
+print(f"Trainable Parameters: {trainable_params:,}")
+print(f"Frozen Parameters: {total_params - trainable_params:,}")
+
 optim = torch.optim.AdamW(model.parameters(),lr=0.001)
 cost_fn = nn.CrossEntropyLoss()
 

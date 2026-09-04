@@ -1,0 +1,15 @@
+{"time":"2026-07-23T23:05:32.9741732+05:30","level":"INFO","msg":"wandb-core"}
+{"time":"2026-07-23T23:05:32.9758515+05:30","level":"INFO","msg":"stream: starting","core version":"0.26.1"}
+{"time":"2026-07-23T23:05:33.7283387+05:30","level":"INFO","msg":"stream: created new stream","id":"lgwpptje"}
+{"time":"2026-07-23T23:05:33.7283387+05:30","level":"INFO","msg":"handler: started"}
+{"time":"2026-07-23T23:05:33.7306497+05:30","level":"INFO","msg":"stream: started"}
+{"time":"2026-07-23T23:05:33.7306497+05:30","level":"INFO","msg":"writer: started","stream_id":"lgwpptje"}
+{"time":"2026-07-23T23:05:33.7306497+05:30","level":"INFO","msg":"sender: started"}
+{"time":"2026-07-23T23:05:33.8270466+05:30","level":"ERROR","msg":"sender: uploadConfigFile: runhandle: run not yet initialized"}
+{"time":"2026-07-23T23:05:33.8281688+05:30","level":"ERROR","msg":"runfiles: runhandle: run not yet initialized"}
+{"time":"2026-07-23T23:05:33.828738+05:30","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-07-23T23:05:33.828738+05:30","level":"INFO","msg":"stream: finishing up"}
+{"time":"2026-07-23T23:05:33.828738+05:30","level":"INFO","msg":"handler: closed"}
+{"time":"2026-07-23T23:05:33.82927+05:30","level":"INFO","msg":"sender: closed"}
+{"time":"2026-07-23T23:05:33.8298224+05:30","level":"INFO","msg":"stream: all finished"}
+{"time":"2026-07-23T23:05:33.8303769+05:30","level":"ERROR","msg":"stream: runURL: runhandle: run not yet initialized"}

@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "d:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\CNN_Architects\traffic_sign_classifier.py", line 165, in <module>
+    outputs = model(images)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\module.py", line 1857, in _call_impl
+    return inner()
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\module.py", line 1805, in inner
+    result = forward_call(*args, **kwargs)
+  File "d:\Pavan\My_Python_Project\DL_Experiments\DL_Experiments\CNN_Architects\All_CNN_arcitects.py", line 68, in forward
+    out = self.layer2(out)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\container.py", line 240, in forward
+    input = module(input)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\modules\pooling.py", line 213, in forward
+    return F.max_pool2d(
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\_jit_internal.py", line 622, in fn
+    return if_false(*args, **kwargs)
+  File "C:\Users\hi\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\nn\functional.py", line 830, in _max_pool2d
+    return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
+RuntimeError: Given input size: (256x2x2). Calculated output size: (256x0x0). Output size is too small

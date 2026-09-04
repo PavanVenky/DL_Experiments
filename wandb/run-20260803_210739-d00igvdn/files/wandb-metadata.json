@@ -1,0 +1,28 @@
+{
+  "os":  "Windows-10-10.0.26200-SP0",
+  "python":  "CPython 3.9.6",
+  "startedAt":  "2026-08-03T15:37:39.116823Z",
+  "program":  "d:\\Pavan\\My_Python_Project\\DL_Experiments\\DL_Experiments\\CNN_Architects\\traffic_sign_classifier.py",
+  "codePath":  "CNN_Architects\\traffic_sign_classifier.py",
+  "codePathLocal":  "CNN_Architects\\traffic_sign_classifier.py",
+  "git":  {
+    "remote":  "https://github.com/PavanVenky/DL_Experiments",
+    "commit":  "bb2340b50595d9b42e903a99d416c2d9f6eea132"
+  },
+  "email":  "pavanvenkykaja@gmail.com",
+  "root":  "D:\\Pavan\\My_Python_Project\\DL_Experiments\\DL_Experiments",
+  "host":  "DESKTOP-MI0VEGJ",
+  "executable":  "C:\\Users\\hi\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+  "cpu_count":  4,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "125914050560",
+      "used":  "62506934272"
+    }
+  },
+  "memory":  {
+    "total":  "16915587072"
+  },
+  "writerId":  "ybgpcto1rc4ul98bm08m4evg9lshfmq7"
+}
